@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
@@ -34,6 +35,17 @@ export default function App() {
       </View>
 
       <StatusBar style="auto" />
+=======
+import "./global.css"
+import { Text, View } from "react-native";
+ 
+export default function App() {
+  return (
+    <View className="flex-1 items-center justify-center bg-white">
+      <Text className="text-xl font-bold text-blue-500">
+        Welcome to Nativewind!
+      </Text>
+>>>>>>> cf074ac5efb8f0fcd4e34c597f7f27619512a433
     </View>
   );
 }
