@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
@@ -47,5 +48,20 @@ export default function App() {
       </Text>
 >>>>>>> cf074ac5efb8f0fcd4e34c597f7f27619512a433
     </View>
+=======
+import "./global.css";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import TabNavigator from "./src/presentation/navigation/TabNavigator";
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <TabNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
+>>>>>>> 24a4932e4c713d393d6f9dc445b6c4af2442ea89
   );
 }
