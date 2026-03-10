@@ -1,94 +1,57 @@
-import React from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, SafeAreaView } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/Ionicons";
 
-export default function ProfileScreen({ userData, onLogout }: any) {
-  const navigation = useNavigation<any>();
+type UserData = {
+  name: string;
+  email: string;
+};
 
-  // Component phụ cho các trạng thái đơn hàng (Chờ thanh toán, Đang giao...)
-  const OrderState = ({ icon, label, badge, onPress }: any) => (
-    <TouchableOpacity className="items-center relative" onPress={onPress}>
-      <Icon name={icon} size={26} color="#4b5563" />
-      <Text className="text-[9px] text-gray-500 mt-1">{label}</Text>
-      {badge && (
-        <View className="absolute -top-1 -right-1 bg-blue-600 rounded-full w-4 h-4 justify-center items-center">
-          <Text className="text-white text-[8px] font-bold">{badge}</Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+interface ProfileScreenProps {
+  userData: UserData;
+  onLogout: () => void;
+}
 
-  // Component cho các mục Menu danh sách
-  const MenuItem = ({ icon, title, badge = null, color = "#4b5563", onPress }: any) => (
-    <TouchableOpacity 
-      className="flex-row items-center p-4 bg-white border-b border-gray-50 active:bg-gray-100"
-      onPress={onPress}
-    >
-      <Icon name={icon} size={22} color={color} />
-      <Text className="flex-1 ml-4 text-gray-700 font-medium">{title}</Text>
-      {badge && (
-        <View className="bg-red-500 px-2 py-0.5 rounded-full mr-2">
-          <Text className="text-white text-[10px] font-bold">{badge}</Text>
-        </View>
-      )}
-      <Icon name="chevron-forward" size={18} color="#d1d5db" />
-    </TouchableOpacity>
-  );
-
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ userData, onLogout }) => {
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        
-        {/* HEADER: Thông tin cá nhân */}
-        <View className="bg-blue-700 pt-10 pb-20 px-6 items-center rounded-b-[40px] shadow-lg">
-          <View className="w-24 h-24 rounded-full border-4 border-white/30 bg-blue-500 justify-center items-center">
-            <Text className="text-white text-3xl font-bold">
-              {userData.name ? userData.name.substring(0, 2) : 'CU'}
-            </Text>
-          </View>
-          <Text className="text-white text-2xl font-bold mt-3">{userData.name || 'CUONG'}</Text>
-          <Text className="text-blue-100 text-sm">{userData.email || 'cuong@gmail.com'}</Text>
+    <SafeAreaView className="flex-1 bg-gray-50" edges={["top"]}>
+      <View className="flex-row items-center px-4 py-3 border-b border-gray-200 bg-white">
+        <Text className="flex-1 text-lg font-bold text-gray-900">
+          Tài khoản
+        </Text>
+        <Icon name="person-circle-outline" size={28} color="#0056A4" />
+      </View>
+
+      <View className="p-4">
+        <View className="bg-white rounded-2xl px-4 py-4 mb-3 shadow-sm">
+          <Text className="text-xs font-semibold text-gray-500 mb-1">
+            Họ và tên
+          </Text>
+          <Text className="text-base font-semibold text-gray-900">
+            {userData.name || "Khách hàng"}
+          </Text>
+
+          <View className="h-px bg-gray-100 my-3" />
+
+          <Text className="text-xs font-semibold text-gray-500 mb-1">
+            Email
+          </Text>
+          <Text className="text-sm text-gray-800">
+            {userData.email || "Chưa cập nhật"}
+          </Text>
         </View>
 
-        {/* PHẦN ĐƠN HÀNG: Đã liên kết OrderHistory */}
-        <View className="mt-6 mx-4 bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100">
-          <View className="flex-row justify-between items-center p-4 border-b border-gray-50">
-            <Text className="font-bold text-gray-800">Đơn hàng của tôi</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('OrderHistory')}>
-              <Text className="text-blue-600 text-xs font-bold">Xem lịch sử {'>'}</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View className="flex-row justify-around py-4">
-            <OrderState icon="wallet-outline" label="Chờ t.toán" onPress={() => navigation.navigate('OrderHistory')} />
-            <OrderState icon="cube-outline" label="Chờ lấy hàng" badge="2" onPress={() => navigation.navigate('OrderHistory')} />
-            <OrderState icon="bus-outline" label="Đang giao" onPress={() => navigation.navigate('OrderHistory')} />
-            <OrderState icon="star-outline" label="Đánh giá" onPress={() => navigation.navigate('OrderHistory')} />
-          </View>
-        </View>
-
-        {/* TIỆN ÍCH: Đã liên kết EditProfile */}
-        <View className="mt-4 mx-4 bg-white rounded-3xl shadow-sm overflow-hidden">
-          <MenuItem 
-            icon="person-outline" 
-            title="Thiết lập tài khoản" 
-            onPress={() => navigation.navigate('EditProfile', { user: userData })}
-          />
-          <MenuItem icon="location-outline" title="Địa chỉ nhận hàng" />
-          <MenuItem icon="card-outline" title="Liên kết ngân hàng" />
-        </View>
-
-        {/* ĐĂNG XUẤT */}
-        <TouchableOpacity 
-          className="m-8 flex-row justify-center items-center py-4 bg-red-50 rounded-2xl border border-red-100"
+        <TouchableOpacity
+          className="mt-4 bg-red-500 rounded-full py-3 items-center"
           onPress={onLogout}
         >
-          <Icon name="log-out-outline" size={20} color="#dc2626" />
-          <Text className="ml-2 text-red-600 font-bold">Đăng xuất</Text>
+          <Text className="text-white font-semibold">Đăng xuất</Text>
         </TouchableOpacity>
-
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
-}
+};
+
+export default ProfileScreen;
+
