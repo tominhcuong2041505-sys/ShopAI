@@ -1,19 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { useAuthStore } from '@features/auth/store/useAuthStore';
 
-export default function EditProfileScreen({ route }: any) {
+export default function EditProfileScreen() {
   const navigation = useNavigation();
-  const { user } = route.params || { user: { name: 'CUONG', email: 'cuong@gmail.com' } };
+  const { user, updateProfile, isLoading, fetchProfile } = useAuthStore();
 
-  const [name, setName] = useState(user.name);
-  const [phone, setPhone] = useState('0912345678'); // Giả lập dữ liệu cũ
+  // show placeholder while profile loading
+  const [name, setName] = useState(user?.fullName || '');
+  const [phone, setPhone] = useState(user?.phone || '');
 
-  const handleSave = () => {
-    Alert.alert("Thành công", "Thông tin cá nhân đã được cập nhật!");
-    navigation.goBack();
+  // keep form in sync if user loads later
+  useEffect(() => {
+    if (user) {
+      setName(user.fullName);
+      setPhone(user.phone);
+    }
+  }, [user]);
+
+  // render simple loading state if user not yet available
+  if (!user) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <Text>Đang tải thông tin người dùng...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const handleSave = async () => {
+    if (!name.trim() || !phone.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ họ tên và số điện thoại');
+      return;
+    }
+
+    try {
+      await updateProfile({ fullName: name.trim(), phone: phone.trim() });
+      // refresh profile from storage in case something changed
+      await fetchProfile();
+      Alert.alert('Thành công', 'Thông tin cá nhân đã được cập nhật!');
+      navigation.goBack();
+    } catch (err) {
+      Alert.alert('Lỗi', 'Không thể lưu thông tin. Vui lòng thử lại.');
+      console.error('updateProfile error', err);
+    }
   };
 
   return (
@@ -59,16 +91,19 @@ export default function EditProfileScreen({ route }: any) {
           <Text className="text-sm font-bold text-gray-600 mb-2">Email (Không thể thay đổi)</Text>
           <TextInput 
             className="bg-gray-100 border border-gray-200 p-4 rounded-2xl text-gray-400"
-            value={user.email}
+            value={user?.email || ''}
             editable={false}
           />
         </View>
 
         <TouchableOpacity 
-          className="bg-blue-700 py-4 rounded-2xl shadow-md"
+          className={`py-4 rounded-2xl shadow-md ${isLoading ? 'bg-gray-400' : 'bg-blue-700'}`}
           onPress={handleSave}
+          disabled={isLoading}
         >
-          <Text className="text-white text-center font-bold text-lg">LƯU THAY ĐỔI</Text>
+          <Text className="text-white text-center font-bold text-lg">
+            {isLoading ? 'Đang lưu...' : 'LƯU THAY ĐỔI'}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -2,7 +2,8 @@ import React, { useState } from 'react'; // 1. Thêm useState
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Switch, StatusBar, SafeAreaView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema, RegisterFormData } from '../../domain/schemas/registerSchema';
+import { registerSchema, RegisterFormData } from '@features/auth/domain/registerSchema';
+import { useAuthStore } from '@features/auth/store/useAuthStore';
 
 export default function RegisterScreen() {
   // 2. Tạo state để quản lý việc hiện/ẩn cho 2 ô mật khẩu
@@ -15,8 +16,15 @@ export default function RegisterScreen() {
     defaultValues: { fullName: '', email: '', phone: '', password: '', confirmPassword: '', terms: false }
   });
 
+  const { register } = useAuthStore();
+
   const onSubmit = async (data: RegisterFormData) => {
-    Alert.alert("Thành công", "Đăng ký thành công! Dữ liệu đã hợp lệ.");
+    try {
+      await register(data);
+      Alert.alert("Thành công", "Đăng ký và đăng nhập tự động thành công!");
+    } catch (err: any) {
+      Alert.alert("Lỗi", err.message || "Không thể đăng ký");
+    }
   };
 
   // Style chung: Thêm 'pr-14' (padding right) để chữ không bị chèn vào nút HIỆN

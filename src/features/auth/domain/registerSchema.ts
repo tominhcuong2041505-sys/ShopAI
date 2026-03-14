@@ -8,11 +8,9 @@ export const registerSchema = z.object({
   email: z.string()
     .email("Email không hợp lệ")
     .refine(async (email) => {
-      // Sửa lỗi Promise: Đảm bảo truyền tham số cho resolve
-      await new Promise((resolve) => {
-        setTimeout(() => resolve(true), 500); 
-      });
-      return email !== "admin@gmail.com"; 
+      // Kiểm tra với authService (AsyncStorage) xem đã dùng chưa
+      const { isEmailAvailable } = await import('@features/auth/api/authService');
+      return await isEmailAvailable(email);
     }, "Email này đã tồn tại trên hệ thống"),
 
   // 3. Field-level: Phone (required, phone format)
